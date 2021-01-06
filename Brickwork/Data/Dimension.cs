@@ -11,9 +11,10 @@
             Columns = array[1];
         }
 
-        public bool IsValidNumber(int number)
+        public bool IsValid()
         {
-            return number % 2 == 0 && number <= 100;
+            return (Rows % 2 == 0 && Rows <= 100) && 
+                   (Columns % 2 == 0 && Columns <= 100);
         }
     }
 }

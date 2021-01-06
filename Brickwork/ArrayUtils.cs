@@ -9,7 +9,8 @@ namespace Brickwork
 
         public static int[,] ReadArray()
         {
-            Dimension dimension = ValidateDimention();
+            Dimension dimension = ReadDimension();
+            ValidateDimention(dimension);
 
             int[,] brickLayer = new int[dimension.Rows, dimension.Columns];
 
@@ -69,14 +70,12 @@ namespace Brickwork
             return IsValidFlag;
         }
 
-        public static Dimension ValidateDimention()
+        public static void ValidateDimention(Dimension dimension)
         {
-            Dimension dimension;
-            do
+            if(!dimension.IsValid())
             {
-                dimension = ReadDimension();
-            } while (!dimension.IsValidNumber(dimension.Rows) || !dimension.IsValidNumber(dimension.Columns));
-            return dimension;
+                throw new Exception("Invalid input: The numbers must be even and less than 100.");
+            }
         }
 
         public static Dimension ReadDimension()
@@ -90,7 +89,7 @@ namespace Brickwork
         }
 
         //Method that prints multidimensional arrays on the console.
-        //Will use it the print the second layer of the wall
+        //Will use it to print the second layer of the wall
         public static void PrintArray(int[,] input)
         {
             int rows = input.GetLength(0);
