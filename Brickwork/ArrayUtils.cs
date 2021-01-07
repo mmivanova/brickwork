@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Brickwork
@@ -22,49 +23,76 @@ namespace Brickwork
                     brickLayer[row, column] = input[column];
                 }
             }
-            if (dimension.Rows > 2 && dimension.Columns>2)
-            {
-                return ValidateArray(brickLayer);
-            }
+
+            ValidateArray(brickLayer);
             return brickLayer;
         }
 
-        public static int[,] ValidateArray(int[,] array)
+        public static void ValidateArray(int[,] array)
         {
-            if (IsValidArray(array))
+            if (!IsValidArray(array))
             {
-                return array;
-            }
-            else
-            {
-                do
-                {
-                    array = ReadArray();
-                } while (!IsValidArray(array));
-                return array;
+                throw new Exception("Invalid input. Each number should be presented exactly twice.");
             }
         }
 
         public static bool IsValidArray(int[,] array)
         {
             bool IsValidFlag = true;
-            for (int r = 0; r < array.GetLength(0) - 2; r++)
+            if (array.GetLength(0) <= 2 && array.GetLength(1) <= 2)
             {
-                int col = 0;
-                if (array[r, col] == array[r + 1, col] 
-                    && array[r + 1, col] == array[r + 2, col] 
-                    || IsValidFlag == false)
-                { 
-                    IsValidFlag = false;
-                    break;
-                }
-                for (int c = 0; c < array.GetLength(1) - 2; c++)
+                goto exit;
+            }
+            else if (array.GetLength(0) <= 2 || array.GetLength(1) <= 2)
+            {
+                IsValidFlag = IsValidArrayWithOneDimensionOfTwo(array);
+                goto exit;
+            }
+            else
+            {
+                for (int r = 0; r < array.GetLength(0) - 2; r++)
                 {
-                    if (array[r, c] == array[r, c + 1] && array[r, c + 1] == array[r, c + 2])
+                    for (int c = 0; c < array.GetLength(1) - 2; c++)
                     {
-                        IsValidFlag = false;
-                        break;
+                        bool containsThreeIdenticalVerticalIndexes = array[r, c] == array[r + 1, c] &&
+                                                                      array[r + 1, c] == array[r + 2, c];
+                        bool containsThreeIdenticalHorizontalIndexes = array[r, c] == array[r, c + 1] &&
+                                                                       array[r, c + 1] == array[r, c + 2];
+                        if (containsThreeIdenticalHorizontalIndexes || containsThreeIdenticalVerticalIndexes)
+                        {
+                            IsValidFlag = false;
+                            goto exit;
+                        }
                     }
+                }
+            }
+        exit:
+            return IsValidFlag;
+        }
+
+        private static bool IsValidArrayWithOneDimensionOfTwo(int[,] array)
+        {
+            bool IsValidFlag = true;
+            Dictionary<int, int> brickValuesWithCount = new Dictionary<int, int>();
+            for (int r = 0; r < array.GetLength(0); r++)
+            {
+                for (int c = 0; c < array.GetLength(1); c++)
+                {
+                    if (brickValuesWithCount.ContainsKey(array[r, c]))
+                    {
+                        brickValuesWithCount[array[r, c]]++;
+                    }
+                    else
+                    {
+                        brickValuesWithCount.Add(array[r, c], 1);
+                    }
+                }
+            }
+            foreach (var value in brickValuesWithCount)
+            {
+                if (value.Value >= 3)
+                {
+                    IsValidFlag = false;
                 }
             }
             return IsValidFlag;
@@ -72,7 +100,7 @@ namespace Brickwork
 
         public static void ValidateDimention(Dimension dimension)
         {
-            if(!dimension.IsValid())
+            if (!dimension.IsValid())
             {
                 throw new Exception("Invalid input: The numbers must be even and less than 100.");
             }
