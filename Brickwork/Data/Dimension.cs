@@ -1,4 +1,4 @@
-﻿namespace Brickwork
+﻿namespace Brickwork.Data
 {
     class Dimension
     {

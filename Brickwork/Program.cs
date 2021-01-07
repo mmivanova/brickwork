@@ -1,4 +1,6 @@
-﻿namespace Brickwork
+﻿using Brickwork.Utilities;
+
+namespace Brickwork
 {
     class Program
     {
