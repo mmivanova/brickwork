@@ -1,4 +1,5 @@
-﻿using Brickwork.Utilities;
+﻿using Brickwork.Data;
+using Brickwork.Utilities;
 
 namespace Brickwork
 {
@@ -6,8 +7,8 @@ namespace Brickwork
     {
         static void Main()
         {
-            int[,] previousLayer = ArrayUtils.ReadArray();
-            int[,] nextLayer = BricklayingAlgorithm.GenerateNextLayer(previousLayer);
+            BrickLayer previousLayer = ArrayUtils.ReadArray();
+            BrickLayer nextLayer = BricklayingAlgorithm.GenerateNextLayer(previousLayer);
             ArrayUtils.PrintArray(nextLayer);
         }
     }

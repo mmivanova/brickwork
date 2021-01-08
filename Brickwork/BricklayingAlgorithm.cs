@@ -1,113 +1,86 @@
-﻿using System;
+﻿using Brickwork.Data;
+using System;
 
 namespace Brickwork
 {
     class BricklayingAlgorithm
     {
-        public static int[,] GenerateNextLayer(int[,] previousLayer)
+        public static BrickLayer GenerateNextLayer(BrickLayer previousLayer)
         {
-            int[,] nextLayer = previousLayer;
-            for (int r = 0; r < nextLayer.GetLength(0); r += 2)
+            BrickLayer nextLayer = previousLayer;
+            for (int r = 0; r < nextLayer.GetRows(); r += 2)
             {
-                for (int c = 0; c < nextLayer.GetLength(1); c += 2)
+                for (int c = 0; c < nextLayer.GetColumns(); c += 2)
                 {
-                    LayBricksOnTwoByTwoArea(nextLayer, r, c);
+                    LayBricksOnTwoByTwoArea(nextLayer, new Coordinates(r, c));
                 }
             }
             return nextLayer;
         }
 
-        private static int[] GetValuesFromTwoByTwoArea(int[,] layer, int r, int c)
+        public static void LayBricksOnTwoByTwoArea(BrickLayer brickLayer, Coordinates coordinates)
         {
-            return new int[]{ layer[r, c],
-                              layer[r, c + 1],
-                              layer[r + 1, c],
-                              layer[r + 1, c + 1]};
-        }
-
-        public static void LayBricksOnTwoByTwoArea(int[,] layer, int row, int column)
-        {
-            int[] values = GetValuesFromTwoByTwoArea(layer, row, column);
-            if (IsTwoHorizontalBricks(values))
+            TwoByTwoArea twoByTwoArea = new TwoByTwoArea(brickLayer, coordinates);
+            if (twoByTwoArea.IsTwoHorizontalBricks())
             {
-                PlaceTwoVerticalBricks(layer, row, column, values);
+                PlaceTwoVerticalBricks(twoByTwoArea);
             }
-            else if (IsTwoVerticalBricks(values))
+            else if (twoByTwoArea.IsTwoVerticalBricks())
             {
-                PlaceTwoHorizontalBticks(layer, row, column, values);
+                PlaceTwoHorizontalBricks(twoByTwoArea);
             }
-            else if (ContainsOneVerticalBrick(values))
+            else if (twoByTwoArea.ContainsOneVerticalBrick())
             {
-                PlaceTwoHorizontalBticks(layer, row, column, values);
+                PlaceTwoHorizontalBricks(twoByTwoArea);
             }
-            else if (ContainsPartsOfFourDifferentBricks(values))
+            else if (twoByTwoArea.ContainsPartsOfFourDifferentBricks())
             {
-                PlaceTwoVerticalBricks(layer, row, column, values);
+                PlaceTwoVerticalBricks(twoByTwoArea);
             }
             else
             {
                 throw new Exception("-1; There is no solution to your problem.");
             }
+            PlaceBricksOnTwoByTwoAreaOnNextLayer(brickLayer, coordinates, twoByTwoArea);
+
         }
 
-        private static bool ContainsPartsOfFourDifferentBricks(int[] values)
+        private static void PlaceTwoHorizontalBricks(TwoByTwoArea twoByTwoArea)
         {
-            if (values[0] != values[1] &&
-                values[1] != values[2] &&
-                values[2] != values[3])
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private static void PlaceTwoHorizontalBticks(int[,] layer, int row, int column, int[] values)
-        {
-            bool secondBrickIsVertical = values[1].Equals(values[3]) && values[0] != values[2];
+            bool secondBrickIsVertical = twoByTwoArea.SecondBrickIsVertical();
             if (secondBrickIsVertical)
             {
-                layer[row + 1, column] = values[1];
-                layer[row, column + 1] = values[0];
+                twoByTwoArea.DownLeftBrick = twoByTwoArea.DownRightBrick;
+                twoByTwoArea.UpRightBrick = twoByTwoArea.UpLeftBrick;
             }
             else
             {
-                layer[row, column + 1] = values[2];
-                layer[row + 1, column] = values[3];
+                twoByTwoArea.UpRightBrick = twoByTwoArea.DownLeftBrick;
+                twoByTwoArea.DownLeftBrick = twoByTwoArea.DownRightBrick;
             }
         }
 
-        private static void PlaceTwoVerticalBricks(int[,] layer, int row, int column, int[] values)
+        private static void PlaceTwoVerticalBricks(TwoByTwoArea twoByTwoArea)
         {
-            bool fourDifferentParts = ContainsPartsOfFourDifferentBricks(values);
+            bool fourDifferentParts = twoByTwoArea.ContainsPartsOfFourDifferentBricks();
             if (fourDifferentParts)
             {
-                layer[row + 1, column] = values[0];
-                layer[row, column + 1] = values[3];
+                twoByTwoArea.DownLeftBrick = twoByTwoArea.UpLeftBrick;
+                twoByTwoArea.UpRightBrick = twoByTwoArea.DownRightBrick;
             }
             else
             {
-                layer[row + 1, column] = values[1];
-                layer[row, column + 1] = values[3];
+                twoByTwoArea.DownLeftBrick = twoByTwoArea.UpRightBrick;
+                twoByTwoArea.UpRightBrick = twoByTwoArea.DownRightBrick;
             }
         }
 
-        public static bool ContainsOneVerticalBrick(int[] values)
+        public static void PlaceBricksOnTwoByTwoAreaOnNextLayer(BrickLayer brickLayer, Coordinates coordinates, TwoByTwoArea twoByTwoArea)
         {
-            bool firstBrickIsVertical = values[0].Equals(values[2]) && values[1] != values[3];
-            bool secondBrickIsVertical = values[1].Equals(values[3]) && values[0] != values[2];
-            bool hasOneVerticalBrick = firstBrickIsVertical || secondBrickIsVertical;
-            
-            return hasOneVerticalBrick;
-        }
-
-        private static bool IsTwoVerticalBricks(int[] values)
-        {
-            return values[0].Equals(values[2]) && values[1].Equals(values[3]);
-        }
-
-        private static bool IsTwoHorizontalBricks(int[] values)
-        {
-            return values[0].Equals(values[1]) && values[2].Equals(values[3]);
+            brickLayer.Set(coordinates, twoByTwoArea.UpLeftBrick);
+            brickLayer.Set(coordinates.Row, coordinates.Column + 1, twoByTwoArea.UpRightBrick);
+            brickLayer.Set(coordinates.Row + 1, coordinates.Column, twoByTwoArea.DownLeftBrick);
+            brickLayer.Set(coordinates.Row + 1, coordinates.Column + 1, twoByTwoArea.DownRightBrick);
         }
     }
 }
