@@ -3,7 +3,8 @@ using System;
 
 namespace Brickwork.Business
 {
-    // This class is responsible for finding the correct BrickPattern of a given TwoByTwoArea
+    // This class is responsible for finding the correct 
+    // BrickPattern of a given TwoByTwoArea
     class BrickPatternFinder
     {
         public BrickPattern Find(TwoByTwoArea twoByTwoArea)
