@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Brickwork.Data
+﻿namespace Brickwork.Data
 {
+    // Wrapping and abstracting out the complexity of 
+    // a multidimensional array
     class BrickLayer
     {
-        //wrapper of multidimensional array
-        //facade pattern
-        //abstraction of the idea of multidimensional array
-
+        // Remove setter in order to make it inaccessible
         private int[,] Layer { get; }
 
-        // remove setter in order to prevent it being changed in other classes
+        // Remove setter in order to make it immutable
         public Dimension Dimension { get; }
 
         public BrickLayer(int[,] layer)
@@ -21,38 +16,40 @@ namespace Brickwork.Data
             Dimension = new Dimension(this);
         }
 
+        // Returns the value behind the given coordinates
         public int Get(Coordinates coordinates)
         {
             return Layer[coordinates.Row, coordinates.Column];
         }
 
+        // Overload of Get(coordinates)
         public int Get(int row, int column)
         {
             return Layer[row, column];
         }
 
+        // Sets new value to the given coordinates
         public void Set(Coordinates coordinates, int value)
         {
             Layer[coordinates.Row, coordinates.Column] = value;
         }
 
+        // Overload of Set(coordinates, value)
         public void Set(int row, int column, int value)
         {
             Layer[row, column] = value;
         }
 
-        //heigth
+        // Returns the heigth of the layer
         public int GetRows()
         {
             return Layer.GetLength(0);
         }
 
-        //width
+        // Returns the width of the layer
         public int GetColumns()
         {
             return Layer.GetLength(1);
         }
-
-
     }
 }

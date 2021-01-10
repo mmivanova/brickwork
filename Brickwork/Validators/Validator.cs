@@ -2,18 +2,29 @@
 using System;
 using System.Collections.Generic;
 
-namespace Brickwork.Utilities
+namespace Brickwork.Validators
 {
-    class Validator
+    // Class that validates the user input
+    // given specific conditions
+     class Validator
     {
-        public static void ValidateArray(BrickLayer brickLayer)
+        // Throws exceptions if the user input 
+        // for brick layer and dimension is invalid
+        public static void ValidateArray(BrickLayer brickLayer, Dimension inputDimension)
         {
             if (!IsValidArray(brickLayer))
             {
                 throw new Exception("Invalid input. Each number should be presented exactly twice.");
             }
+            if (brickLayer.Dimension.Rows != inputDimension.Rows || 
+                brickLayer.Dimension.Columns != inputDimension.Columns)
+            {
+                throw new Exception("Invalid input. Incorrect number of rows or columns.");
+            }
         }
 
+        // A valid array will be one in which
+        // no brick takes more than two places in the layer
         private static bool IsValidArray(BrickLayer brickLayer)
         {
             bool IsValidFlag = true;
@@ -35,6 +46,9 @@ namespace Brickwork.Utilities
             return IsValidFlag;
         }
 
+        // If one of the dimensions equals 2,
+        // the method checks only the other one 
+        // if there are bricks taking more than two places
         private static bool IsValidArrayWithOneDimensionOfTwo(BrickLayer brickLayer)
         {
             bool IsValidFlag = true;
@@ -63,6 +77,8 @@ namespace Brickwork.Utilities
             return IsValidFlag;
         }
 
+        // Goes through every row and column and
+        // checks for bricks taking more than two places
         private static bool IsValidArrayWithDimensionsMoreThanTwo(BrickLayer brickLayer)
         {
             bool IsValidFlag = true;
@@ -86,7 +102,9 @@ namespace Brickwork.Utilities
             return IsValidFlag;
         }
 
-        public static void ValidateDimention(Dimension dimension)
+        // If the dimension is invalid,
+        // an exception is thrown
+        public static void ValidateDimension(Dimension dimension)
         {
             if (!dimension.IsValid())
             {

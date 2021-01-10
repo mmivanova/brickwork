@@ -1,5 +1,6 @@
 ﻿namespace Brickwork.Data
 {
+    // Represents X(row), Y(column) values in multidimensional array 
     class Coordinates
     {
         public int Row { get; set; }
