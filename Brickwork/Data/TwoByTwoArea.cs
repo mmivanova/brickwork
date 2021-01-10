@@ -8,7 +8,6 @@
         public int UpRightBrick { get; set; }
         public int DownLeftBrick { get; set; }
         public int DownRightBrick { get; set; }
-
         public TwoByTwoArea(BrickLayer brickLayer, Coordinates coordinates)
         {   
             UpLeftBrick = brickLayer.Get(coordinates);

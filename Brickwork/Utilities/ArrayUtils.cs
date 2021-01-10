@@ -9,7 +9,6 @@ namespace Brickwork.Utilities
     // regarding arrays
     static class ArrayUtils
     {
-        
         private const char Separator = ' ';
         private const string Column = "|";
         private const char Dash = '-';

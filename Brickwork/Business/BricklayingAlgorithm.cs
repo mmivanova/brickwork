@@ -7,6 +7,9 @@ namespace Brickwork.Business
     // brick layer
     class BricklayingAlgorithm
     {
+        private static readonly BrickPatternFinder brickPatternFinder = new BrickPatternFinder();
+        private static readonly BrickPatternSolver brickPatternSolver = new BrickPatternSolver();
+
         // Generates the next layer of bricks by dividing the 
         // layer on two by two areas 
         public static BrickLayer GenerateNextLayer(BrickLayer previousLayer)
@@ -19,6 +22,7 @@ namespace Brickwork.Business
                     LayBricksOnTwoByTwoArea(nextLayer, new Coordinates(r, c));
                 }
             }
+
             return nextLayer;
         }
 
@@ -28,64 +32,11 @@ namespace Brickwork.Business
         public static void LayBricksOnTwoByTwoArea(BrickLayer brickLayer, Coordinates coordinates)
         {
             TwoByTwoArea twoByTwoArea = new TwoByTwoArea(brickLayer, coordinates);
-            if (twoByTwoArea.BothBricksAreHorizontal())
-            {
-                PlaceTwoVerticalBricks(twoByTwoArea);
-            }
-            else if (twoByTwoArea.BothBricksAreVertical())
-            {
-                PlaceTwoHorizontalBricks(twoByTwoArea);
-            }
-            else if (twoByTwoArea.ContainsOnlyOneVerticalBrick())
-            {
-                PlaceTwoHorizontalBricks(twoByTwoArea);
-            }
-            else if (twoByTwoArea.ContainsPartsOfFourDifferentBricks())
-            {
-                PlaceTwoVerticalBricks(twoByTwoArea);
-            }
-            else
-            {
-                // If no pattern is found it throws an exeption for missing solution
-                throw new Exception("-1; There is no solution to your problem.");
-            }
-            PlaceBricksOnTwoByTwoAreaOnNextLayer(brickLayer, coordinates, twoByTwoArea);
 
-        }
+            BrickPattern brickPattern = brickPatternFinder.Find(twoByTwoArea);
+            TwoByTwoArea solvedTwoByTwoArea = brickPatternSolver.Solve(twoByTwoArea, brickPattern);
 
-        // If on two by two area both or one of the bricks are vertical
-        // two horizontal ones are placed above them
-        private static void PlaceTwoHorizontalBricks(TwoByTwoArea twoByTwoArea)
-        {
-            bool secondBrickIsVertical = twoByTwoArea.OnlySecondBrickIsVertical();
-            if (secondBrickIsVertical)
-            {
-                twoByTwoArea.DownLeftBrick = twoByTwoArea.DownRightBrick;
-                twoByTwoArea.UpRightBrick = twoByTwoArea.UpLeftBrick;
-            }
-            else
-            {
-                twoByTwoArea.UpRightBrick = twoByTwoArea.DownLeftBrick;
-                twoByTwoArea.DownLeftBrick = twoByTwoArea.DownRightBrick;
-            }
-        }
-
-        // If on two by two area both of the bricks are horizontal
-        // or there are four different bricks
-        // two vertical ones are placed above
-        private static void PlaceTwoVerticalBricks(TwoByTwoArea twoByTwoArea)
-        {
-            bool fourDifferentParts = twoByTwoArea.ContainsPartsOfFourDifferentBricks();
-            if (fourDifferentParts)
-            {
-                twoByTwoArea.DownLeftBrick = twoByTwoArea.UpLeftBrick;
-                twoByTwoArea.UpRightBrick = twoByTwoArea.DownRightBrick;
-            }
-            else
-            {
-                twoByTwoArea.DownLeftBrick = twoByTwoArea.UpRightBrick;
-                twoByTwoArea.UpRightBrick = twoByTwoArea.DownRightBrick;
-            }
+            PlaceBricksOnTwoByTwoAreaOnNextLayer(brickLayer, coordinates, solvedTwoByTwoArea);
         }
 
         // Sets the values to the two by two area 
